@@ -14,6 +14,14 @@ class TaskService(private val taskRepository: TaskRepository) {
     fun getTasksForUser(userId: Long): List<Task> {
         return taskRepository.findByUserId(userId)
     }
+    
+    fun getTasksForUserByCategory(userId: Long, categoryId: Long): List<Task> {
+        return taskRepository.findByUserIdAndCategoryId(userId, categoryId)
+    }
+    
+    fun getTasksByCategory(categoryId: Long): List<Task> {
+        return taskRepository.findByCategoryId(categoryId)
+    }
 
     fun getTaskById(id: Long): Task? {
         return taskRepository.findById(id).orElse(null)

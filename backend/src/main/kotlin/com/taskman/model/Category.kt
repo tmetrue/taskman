@@ -5,27 +5,19 @@ import io.micronaut.data.annotation.DateUpdated
 import io.micronaut.data.annotation.GeneratedValue
 import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
-import io.micronaut.data.annotation.Relation
 import io.micronaut.serde.annotation.Serdeable
 import java.time.Instant
 
 @Serdeable
-@MappedEntity(value = "tasks")
-data class Task(
+@MappedEntity(value = "categories")
+data class Category(
     @field:Id
     @field:GeneratedValue
     var id: Long? = null,
     
-    var title: String,
+    var name: String,
     var description: String? = null,
-    var completed: Boolean = false,
-    var dueDate: String? = null,
-    
-    var userId: Long? = null,
-    var categoryId: Long? = null,
-    
-    @Relation(value = Relation.Kind.MANY_TO_ONE)
-    var category: Category? = null,
+    var displayOrder: Int = 0,
     
     @DateCreated
     var createdAt: Instant? = null,

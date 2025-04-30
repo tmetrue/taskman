@@ -10,4 +10,6 @@ interface TaskRepository : CrudRepository<Task, Long> {
     fun findByCompleted(completed: Boolean): List<Task>
     fun findByUserId(userId: Long): List<Task>
     fun findByUserIdAndCompleted(userId: Long, completed: Boolean): List<Task>
+    fun findByUserIdAndCategoryId(userId: Long, categoryId: Long): List<Task>
+    fun findByCategoryId(categoryId: Long): List<Task>
 }

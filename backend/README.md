@@ -72,11 +72,20 @@ docker-compose up postgres
 - `POST /login` - Login and get JWT token
 - `GET /api/auth/me` - Get current user profile
 
+### Categories (Some operations admin-only)
+
+- `GET /api/categories` - List all categories (authenticated)
+- `GET /api/categories/{id}` - Get a specific category (authenticated)
+- `POST /api/categories` - Create a new category (admin only)
+- `PUT /api/categories/{id}` - Update a category (admin only)
+- `DELETE /api/categories/{id}` - Delete a category (admin only)
+
 ### Tasks (Protected - requires authentication)
 
 - `GET /api/tasks/my` - Get current user's tasks
 - `GET /api/tasks/{id}` - Get a specific task (if owned by user)
 - `GET /api/tasks/status/{completed}` - Get user's tasks by completion status
+- `GET /api/tasks/category/{categoryId}` - Get tasks by category (admin sees all, users see own)
 - `POST /api/tasks` - Create a new task
 - `PUT /api/tasks/{id}` - Update a task (if owned by user)
 - `DELETE /api/tasks/{id}` - Delete a task (if owned by user)
