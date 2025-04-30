@@ -11,18 +11,21 @@ import {
     Button,
     Paper,
     Stack,
-    Chip
+    Chip,
+    Tooltip
 } from '@mui/material';
-import { Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
+import { Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon, Lock as LockIcon } from '@mui/icons-material';
 import { Task } from '../types/Task';
 import { taskService } from '../services/taskService';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/authService';
 
 export default function Tasks() {
     const navigate = useNavigate();
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const isAuthenticated = authService.isAuthenticated();
 
     useEffect(() => {
         loadTasks();
@@ -42,6 +45,8 @@ export default function Tasks() {
     };
 
     const handleToggleComplete = async (task: Task) => {
+        if (!isAuthenticated) return;
+        
         try {
             const updatedTask = await taskService.updateTask(task.id!, {
                 ...task,
@@ -54,6 +59,8 @@ export default function Tasks() {
     };
 
     const handleDelete = async (id: number) => {
+        if (!isAuthenticated) return;
+        
         try {
             await taskService.deleteTask(id);
             setTasks(tasks.filter(task => task.id !== id));
@@ -63,6 +70,7 @@ export default function Tasks() {
     };
 
     const handleEdit = (task: Task) => {
+        if (!isAuthenticated) return;
         navigate(`/tasks/${task.id}/edit`);
     };
 
@@ -73,15 +81,17 @@ export default function Tasks() {
         <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
                 <Typography variant="h4" component="h1">
-                    My Tasks
+                    Tasks
                 </Typography>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => navigate('/tasks/new')}
-                >
-                    Create Task
-                </Button>
+                {isAuthenticated && (
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={() => navigate('/tasks/new')}
+                    >
+                        Create Task
+                    </Button>
+                )}
             </Stack>
             
             <Paper elevation={2}>
@@ -91,28 +101,39 @@ export default function Tasks() {
                             key={task.id}
                             divider
                             secondaryAction={
-                                <ListItemSecondaryAction>
-                                    <IconButton 
-                                        edge="end" 
-                                        aria-label="edit"
-                                        onClick={() => handleEdit(task)}
-                                    >
-                                        <EditIcon />
-                                    </IconButton>
-                                    <IconButton 
-                                        edge="end" 
-                                        aria-label="delete"
-                                        onClick={() => handleDelete(task.id!)}
-                                    >
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </ListItemSecondaryAction>
+                                isAuthenticated ? (
+                                    <ListItemSecondaryAction>
+                                        <IconButton 
+                                            edge="end" 
+                                            aria-label="edit"
+                                            onClick={() => handleEdit(task)}
+                                        >
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton 
+                                            edge="end" 
+                                            aria-label="delete"
+                                            onClick={() => handleDelete(task.id!)}
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </ListItemSecondaryAction>
+                                ) : (
+                                    <ListItemSecondaryAction>
+                                        <Tooltip title="Login to edit tasks">
+                                            <IconButton edge="end" aria-label="locked">
+                                                <LockIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </ListItemSecondaryAction>
+                                )
                             }
                         >
                             <Checkbox
                                 edge="start"
                                 checked={task.completed}
                                 onChange={() => handleToggleComplete(task)}
+                                disabled={!isAuthenticated}
                             />
                             <ListItemText
                                 primary={
@@ -155,7 +176,7 @@ export default function Tasks() {
                         <ListItem>
                             <ListItemText 
                                 primary="No tasks found" 
-                                secondary="Create a new task to get started"
+                                secondary={isAuthenticated ? "Create a new task to get started" : "Login to create tasks"}
                             />
                         </ListItem>
                     )}

@@ -30,21 +30,20 @@ function App() {
           <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
             TaskMan
           </Typography>
-          {isAuthenticated && (
+          {isAuthenticated ? (
             <Button color="inherit" onClick={handleLogout}>
               Logout
+            </Button>
+          ) : (
+            <Button color="inherit" component={Link} to="/login">
+              Login
             </Button>
           )}
         </Toolbar>
       </AppBar>
       <Container>
         <Routes>
-          <Route 
-            path="/" 
-            element={
-              isAuthenticated ? <Tasks /> : <Navigate to="/login" />
-            } 
-          />
+          <Route path="/" element={<Tasks />} />
           <Route 
             path="/login" 
             element={
