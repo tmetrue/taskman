@@ -9,13 +9,17 @@ import {
     IconButton,
     Checkbox,
     Button,
-    Paper
+    Paper,
+    Stack,
+    Chip
 } from '@mui/material';
-import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+import { Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import { Task } from '../types/Task';
 import { taskService } from '../services/taskService';
+import { useNavigate } from 'react-router-dom';
 
 export default function Tasks() {
+    const navigate = useNavigate();
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -58,14 +62,27 @@ export default function Tasks() {
         }
     };
 
+    const handleEdit = (task: Task) => {
+        navigate(`/tasks/${task.id}/edit`);
+    };
+
     if (loading) return <Typography>Loading...</Typography>;
     if (error) return <Typography color="error">{error}</Typography>;
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-                Tasks
-            </Typography>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+                <Typography variant="h4" component="h1">
+                    My Tasks
+                </Typography>
+                <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={() => navigate('/tasks/new')}
+                >
+                    Create Task
+                </Button>
+            </Stack>
             
             <Paper elevation={2}>
                 <List>
@@ -75,7 +92,11 @@ export default function Tasks() {
                             divider
                             secondaryAction={
                                 <ListItemSecondaryAction>
-                                    <IconButton edge="end" aria-label="edit">
+                                    <IconButton 
+                                        edge="end" 
+                                        aria-label="edit"
+                                        onClick={() => handleEdit(task)}
+                                    >
                                         <EditIcon />
                                     </IconButton>
                                     <IconButton 
@@ -94,24 +115,50 @@ export default function Tasks() {
                                 onChange={() => handleToggleComplete(task)}
                             />
                             <ListItemText
-                                primary={task.title}
-                                secondary={
-                                    <>
-                                        {task.description && (
-                                            <Typography component="span" variant="body2" color="text.secondary">
-                                                {task.description}
-                                            </Typography>
-                                        )}
+                                primary={
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Typography 
+                                            variant="body1" 
+                                            sx={{ 
+                                                textDecoration: task.completed ? 'line-through' : 'none',
+                                                color: task.completed ? 'text.secondary' : 'text.primary'
+                                            }}
+                                        >
+                                            {task.title}
+                                        </Typography>
                                         {task.dueDate && (
-                                            <Typography component="span" variant="body2" color="text.secondary" display="block">
-                                                Due: {new Date(task.dueDate).toLocaleDateString()}
-                                            </Typography>
+                                            <Chip 
+                                                size="small" 
+                                                label={`Due: ${new Date(task.dueDate).toLocaleDateString()}`}
+                                                color={new Date(task.dueDate) < new Date() ? 'error' : 'default'}
+                                            />
                                         )}
-                                    </>
+                                    </Box>
+                                }
+                                secondary={
+                                    task.description && (
+                                        <Typography 
+                                            variant="body2" 
+                                            color="text.secondary"
+                                            sx={{ 
+                                                textDecoration: task.completed ? 'line-through' : 'none'
+                                            }}
+                                        >
+                                            {task.description}
+                                        </Typography>
+                                    )
                                 }
                             />
                         </ListItem>
                     ))}
+                    {tasks.length === 0 && (
+                        <ListItem>
+                            <ListItemText 
+                                primary="No tasks found" 
+                                secondary="Create a new task to get started"
+                            />
+                        </ListItem>
+                    )}
                 </List>
             </Paper>
         </Box>

@@ -1,7 +1,17 @@
 import axios from 'axios';
 import { Task } from '../types/Task';
+import { authService } from './authService';
 
 const API_URL = 'http://localhost:8888/api/tasks';
+
+// Set up axios interceptor to include auth token
+axios.interceptors.request.use(config => {
+    const token = authService.getToken();
+    if (token) {
+        config.headers.Authorization = token;
+    }
+    return config;
+});
 
 export const taskService = {
     async getAllTasks(): Promise<Task[]> {
