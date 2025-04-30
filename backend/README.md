@@ -66,12 +66,23 @@ docker-compose up postgres
 
 ## API Endpoints
 
-- `GET /api/tasks` - List all tasks
-- `GET /api/tasks/{id}` - Get a specific task
-- `GET /api/tasks/status/{completed}` - Get tasks by completion status
+### Authentication
+
+- `POST /api/auth/register` - Register a new user
+- `POST /login` - Login and get JWT token
+
+### Tasks (Protected - requires authentication)
+
+- `GET /api/tasks/my` - Get current user's tasks
+- `GET /api/tasks/{id}` - Get a specific task (if owned by user)
+- `GET /api/tasks/status/{completed}` - Get user's tasks by completion status
 - `POST /api/tasks` - Create a new task
-- `PUT /api/tasks/{id}` - Update a task
-- `DELETE /api/tasks/{id}` - Delete a task
+- `PUT /api/tasks/{id}` - Update a task (if owned by user)
+- `DELETE /api/tasks/{id}` - Delete a task (if owned by user)
+
+### Admin Only
+
+- `GET /api/tasks` - List all tasks (admin only)
 
 ## Database Migrations
 

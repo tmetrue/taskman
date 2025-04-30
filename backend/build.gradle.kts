@@ -33,10 +33,16 @@ dependencies {
     implementation("jakarta.validation:jakarta.validation-api")
     implementation("io.micronaut.serde:micronaut-serde-jackson")
     
+    // Security
+    implementation("io.micronaut.security:micronaut-security")
+    implementation("io.micronaut.security:micronaut-security-jwt")
+    implementation("io.micronaut.security:micronaut-security-annotations")
+    
     // Database
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     implementation("io.micronaut.flyway:micronaut-flyway")
+    implementation("at.favre.lib:bcrypt:0.10.2")
     runtimeOnly("org.postgresql:postgresql")
     
     // Logging

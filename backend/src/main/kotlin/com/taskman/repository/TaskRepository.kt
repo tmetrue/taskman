@@ -8,4 +8,6 @@ import io.micronaut.data.repository.CrudRepository
 @JdbcRepository(dialect = Dialect.POSTGRES)
 interface TaskRepository : CrudRepository<Task, Long> {
     fun findByCompleted(completed: Boolean): List<Task>
+    fun findByUserId(userId: Long): List<Task>
+    fun findByUserIdAndCompleted(userId: Long, completed: Boolean): List<Task>
 }
