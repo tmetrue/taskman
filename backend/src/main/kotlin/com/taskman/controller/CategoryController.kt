@@ -6,6 +6,7 @@ import com.taskman.service.CategoryService
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
 import io.micronaut.security.annotation.Secured
+import io.micronaut.security.rules.SecurityRule
 import io.micronaut.validation.Validated
 import jakarta.inject.Inject
 import jakarta.validation.Valid
@@ -15,13 +16,13 @@ import jakarta.validation.Valid
 class CategoryController(@Inject private val categoryService: CategoryService) {
 
     @Get
-    @Secured("IS_AUTHENTICATED")  // Both regular users and admins can view categories
+    @Secured(SecurityRule.IS_ANONYMOUS)  // Allow anonymous access to categories
     fun getAllCategories(): HttpResponse<List<Category>> {
         return HttpResponse.ok(categoryService.getAllCategories())
     }
     
     @Get("/{id}")
-    @Secured("IS_AUTHENTICATED")  // Both regular users and admins can view categories
+    @Secured(SecurityRule.IS_ANONYMOUS)  // Allow anonymous access to view category details
     fun getCategoryById(id: Long): HttpResponse<Category> {
         val categoryOptional = categoryService.getCategoryById(id)
         return if (categoryOptional.isPresent) {

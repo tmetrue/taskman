@@ -12,19 +12,19 @@ import io.micronaut.security.rules.SecurityRule
 import jakarta.inject.Inject
 
 @Controller("/api/tasks")
-@Secured(SecurityRule.IS_AUTHENTICATED)
 class TaskController(
     @Inject private val taskService: TaskService,
     @Inject private val categoryService: CategoryService
 ) {
 
     @Get
-    @Secured("ROLE_ADMIN")  // Admin only can see all tasks
+    @Secured(SecurityRule.IS_ANONYMOUS)  // Allow anonymous access
     fun getAllTasks(): HttpResponse<List<Task>> {
         return HttpResponse.ok(taskService.getAllTasks())
     }
     
     @Get("/my")
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     fun getMyTasks(authentication: Authentication): HttpResponse<List<Task>> {
         val userId = authentication.attributes["id"]?.toString()?.toLong() 
             ?: return HttpResponse.unauthorized()
@@ -33,52 +33,45 @@ class TaskController(
     }
 
     @Get("/{id}")
-    fun getTaskById(id: Long, authentication: Authentication): HttpResponse<Task> {
+    @Secured(SecurityRule.IS_ANONYMOUS)
+    fun getTaskById(id: Long, authentication: Authentication?): HttpResponse<Task> {
         val task = taskService.getTaskById(id) ?: return HttpResponse.notFound()
         
-        // Check if this task belongs to the current user or is admin
-        val userId = authentication.attributes["id"]?.toString()?.toLong()
-        val isAdmin = authentication.roles.contains("ROLE_ADMIN")
-        
-        if (!isAdmin && userId != null && task.userId != userId) {
-            return HttpResponse.unauthorized()
+        // If user is authenticated, check if they have permission to view this task
+        if (authentication != null) {
+            val userId = authentication.attributes["id"]?.toString()?.toLong()
+            val isAdmin = authentication.roles.contains("ROLE_ADMIN")
+            
+            // If it's a private task and user is not admin or owner, deny access
+            if (task.userId != null && !isAdmin && userId != task.userId) {
+                return HttpResponse.unauthorized()
+            }
         }
         
         return HttpResponse.ok(task)
     }
     
     @Get("/status/{completed}")
-    fun getTasksByStatus(completed: Boolean, authentication: Authentication): HttpResponse<List<Task>> {
-        val userId = authentication.attributes["id"]?.toString()?.toLong() 
-            ?: return HttpResponse.unauthorized()
-        
-        return HttpResponse.ok(taskService.findUserTasksByCompleted(userId, completed))
+    @Secured(SecurityRule.IS_ANONYMOUS)
+    fun getTasksByStatus(completed: Boolean): HttpResponse<List<Task>> {
+        return HttpResponse.ok(taskService.findTasksByCompleted(completed))
     }
     
     @Get("/category/{categoryId}")
-    fun getTasksByCategory(categoryId: Long, authentication: Authentication): HttpResponse<List<Task>> {
-        val userId = authentication.attributes["id"]?.toString()?.toLong() 
-            ?: return HttpResponse.unauthorized()
-        val isAdmin = authentication.roles.contains("ROLE_ADMIN")
-        
+    @Secured(SecurityRule.IS_ANONYMOUS)
+    fun getTasksByCategory(categoryId: Long): HttpResponse<List<Task>> {
         // Verify category exists
         val categoryExists = categoryService.getCategoryById(categoryId).isPresent
         if (!categoryExists) {
             return HttpResponse.notFound()
         }
         
-        val tasks = if (isAdmin) {
-            // Admins can see all tasks in a category
-            taskService.getTasksByCategory(categoryId)
-        } else {
-            // Regular users can only see their own tasks in a category
-            taskService.getTasksForUserByCategory(userId, categoryId)
-        }
-        
-        return HttpResponse.ok(tasks)
+        // Return all tasks in the category (no filtering)
+        return HttpResponse.ok(taskService.getTasksByCategory(categoryId))
     }
 
     @Post
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     fun createTask(@Body task: Task, authentication: Authentication): HttpResponse<Task> {
         val userId = authentication.attributes["id"]?.toString()?.toLong() 
             ?: return HttpResponse.unauthorized()
@@ -98,6 +91,7 @@ class TaskController(
     }
 
     @Put("/{id}")
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     fun updateTask(id: Long, @Body task: Task, authentication: Authentication): HttpResponse<Task> {
         val userId = authentication.attributes["id"]?.toString()?.toLong() 
             ?: return HttpResponse.unauthorized()
@@ -125,6 +119,7 @@ class TaskController(
     }
 
     @Delete("/{id}")
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     fun deleteTask(id: Long, authentication: Authentication): HttpResponse<Unit> {
         val userId = authentication.attributes["id"]?.toString()?.toLong() 
             ?: return HttpResponse.unauthorized()

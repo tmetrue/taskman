@@ -67,5 +67,3 @@ local.properties
 
 # Exclude gradle wrapper jar
 !gradle/wrapper/gradle-wrapper.jar
-
-*.log

@@ -69,26 +69,29 @@ docker-compose up postgres
 ### Authentication
 
 - `POST /api/auth/register` - Register a new user
-- `POST /login` - Login and get JWT token
-- `GET /api/auth/me` - Get current user profile
+- `POST /api/auth/login` - Login and get JWT token
+- `POST /api/auth/logout` - Logout (requires authentication)
+- `GET /api/auth/me` - Get current user profile (requires authentication)
+- `GET /api/auth/check-token` - Validate JWT token
 
-### Categories (Some operations admin-only)
+### Categories
 
-- `GET /api/categories` - List all categories (authenticated)
-- `GET /api/categories/{id}` - Get a specific category (authenticated)
+- `GET /api/categories` - List all categories (anonymous allowed)
+- `GET /api/categories/{id}` - Get a specific category (anonymous allowed)
 - `POST /api/categories` - Create a new category (admin only)
 - `PUT /api/categories/{id}` - Update a category (admin only)
 - `DELETE /api/categories/{id}` - Delete a category (admin only)
 
-### Tasks (Protected - requires authentication)
+### Tasks
 
-- `GET /api/tasks/my` - Get current user's tasks
-- `GET /api/tasks/{id}` - Get a specific task (if owned by user)
-- `GET /api/tasks/status/{completed}` - Get user's tasks by completion status
-- `GET /api/tasks/category/{categoryId}` - Get tasks by category (admin sees all, users see own)
-- `POST /api/tasks` - Create a new task
-- `PUT /api/tasks/{id}` - Update a task (if owned by user)
-- `DELETE /api/tasks/{id}` - Delete a task (if owned by user)
+- `GET /api/tasks` - List all tasks (anonymous allowed)
+- `GET /api/tasks/{id}` - Get a specific task (anonymous allowed)
+- `GET /api/tasks/my` - Get current user's tasks (requires authentication)
+- `GET /api/tasks/status/{completed}` - Get tasks by completion status (anonymous allowed)
+- `GET /api/tasks/category/{categoryId}` - Get tasks by category (anonymous allowed)
+- `POST /api/tasks` - Create a new task (requires authentication)
+- `PUT /api/tasks/{id}` - Update a task (requires authentication, owner only)
+- `DELETE /api/tasks/{id}` - Delete a task (requires authentication, owner only)
 
 ### Admin Only
 

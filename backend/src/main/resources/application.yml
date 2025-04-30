@@ -19,12 +19,35 @@ micronaut:
             expiration: 86400  # 1 day in seconds
     endpoints:
       login:
+        path: /api/auth/login  # Override the default /login path
         enabled: true
         path: /api/auth/login
       oauth:
         enabled: true
       logout:
+        path: /api/auth/logout  # Override the default /logout path
         enabled: true
+    intercept-url-map:
+      - pattern: /api/tasks/**
+        httpMethod: GET
+        access:
+          - isAnonymous()
+      - pattern: /api/categories/**
+        httpMethod: GET
+        access:
+          - isAnonymous()
+      - pattern: /api/auth/login
+        httpMethod: POST
+        access:
+          - isAnonymous()
+      - pattern: /api/auth/register
+        httpMethod: POST
+        access:
+          - isAnonymous()
+      - pattern: /api/auth/check-token
+        httpMethod: GET
+        access:
+          - isAnonymous()
 
 datasources:
   default:
