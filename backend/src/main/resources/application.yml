@@ -2,7 +2,7 @@ micronaut:
   application:
     name: taskman
   server:
-    port: 8080
+    port: 8888
     cors:
       enabled: true
 

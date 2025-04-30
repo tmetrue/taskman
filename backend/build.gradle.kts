@@ -2,6 +2,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.22"
     id("org.jetbrains.kotlin.kapt") version "1.9.22"
     id("org.jetbrains.kotlin.plugin.allopen") version "1.9.22"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
     id("io.micronaut.application") version "4.2.1"
 }
 
@@ -28,10 +29,13 @@ dependencies {
     // Micronaut
     implementation("io.micronaut:micronaut-http-client")
     implementation("io.micronaut:micronaut-jackson-databind")
-    implementation("io.micronaut:micronaut-validation")
+    implementation("io.micronaut.validation:micronaut-validation")
+    implementation("jakarta.validation:jakarta.validation-api")
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
     
     // Logging
     runtimeOnly("ch.qos.logback:logback-classic")
+    runtimeOnly("org.yaml:snakeyaml:2.2")
     
     // Test
     testImplementation("io.micronaut.test:micronaut-test-junit5")
