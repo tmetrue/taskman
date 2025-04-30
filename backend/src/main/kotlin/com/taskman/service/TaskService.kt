@@ -1,40 +1,43 @@
 package com.taskman.service
 
 import com.taskman.model.Task
+import com.taskman.repository.TaskRepository
 import jakarta.inject.Singleton
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicLong
 
 @Singleton
-class TaskService {
-    private val tasks = ConcurrentHashMap<Long, Task>()
-    private val idGenerator = AtomicLong(1)
+class TaskService(private val taskRepository: TaskRepository) {
 
     fun getAllTasks(): List<Task> {
-        return tasks.values.toList()
+        return taskRepository.findAll().toList()
     }
 
     fun getTaskById(id: Long): Task? {
-        return tasks[id]
+        return taskRepository.findById(id).orElse(null)
     }
 
     fun createTask(task: Task): Task {
-        val id = idGenerator.getAndIncrement()
-        task.id = id
-        tasks[id] = task
-        return task
+        return taskRepository.save(task)
     }
 
     fun updateTask(id: Long, task: Task): Task? {
-        if (!tasks.containsKey(id)) {
+        if (!taskRepository.existsById(id)) {
             return null
         }
+        
         task.id = id
-        tasks[id] = task
-        return task
+        return taskRepository.update(task)
     }
 
     fun deleteTask(id: Long): Boolean {
-        return tasks.remove(id) != null
+        if (!taskRepository.existsById(id)) {
+            return false
+        }
+        
+        taskRepository.deleteById(id)
+        return true
+    }
+    
+    fun findTasksByCompleted(completed: Boolean): List<Task> {
+        return taskRepository.findByCompleted(completed)
     }
 }

@@ -21,6 +21,11 @@ class TaskController(@Inject private val taskService: TaskService) {
             HttpResponse.ok(it)
         } ?: HttpResponse.notFound()
     }
+    
+    @Get("/status/{completed}")
+    fun getTasksByStatus(completed: Boolean): HttpResponse<List<Task>> {
+        return HttpResponse.ok(taskService.findTasksByCompleted(completed))
+    }
 
     @Post
     fun createTask(@Body task: Task): HttpResponse<Task> {
