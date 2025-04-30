@@ -20,6 +20,12 @@ micronaut {
     }
 }
 
+allOpen {
+    // Make classes open for mocking
+    annotation("jakarta.inject.Singleton")
+    annotation("io.micronaut.context.annotation.Bean")
+}
+
 dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -37,6 +43,8 @@ dependencies {
     implementation("io.micronaut.security:micronaut-security")
     implementation("io.micronaut.security:micronaut-security-jwt")
     implementation("io.micronaut.security:micronaut-security-annotations")
+    implementation("io.micronaut.reactor:micronaut-reactor")
+    implementation("io.projectreactor:reactor-core")
     
     // Database
     implementation("io.micronaut.data:micronaut-data-jdbc")
@@ -53,6 +61,8 @@ dependencies {
     testImplementation("io.micronaut.test:micronaut-test-junit5")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
 }
 
 application {

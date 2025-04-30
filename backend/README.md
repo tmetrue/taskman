@@ -70,6 +70,7 @@ docker-compose up postgres
 
 - `POST /api/auth/register` - Register a new user
 - `POST /login` - Login and get JWT token
+- `GET /api/auth/me` - Get current user profile
 
 ### Tasks (Protected - requires authentication)
 
@@ -83,6 +84,19 @@ docker-compose up postgres
 ### Admin Only
 
 - `GET /api/tasks` - List all tasks (admin only)
+- `GET /api/admin/users` - List all users
+- `GET /api/admin/users/{id}` - Get a specific user
+- `POST /api/admin/users` - Create a new user
+- `PUT /api/admin/users/{id}` - Update a user
+- `DELETE /api/admin/users/{id}` - Delete a user
+
+## Default Admin Account
+
+A default admin account is created automatically:
+- Username: `admin`
+- Password: `adminSecure123!`
+
+This should be changed in production.
 
 ## Database Migrations
 

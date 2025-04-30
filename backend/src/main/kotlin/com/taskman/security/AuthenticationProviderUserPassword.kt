@@ -1,64 +1,66 @@
 package com.taskman.security
 
 import com.taskman.service.UserService
+import io.micronaut.core.annotation.Nullable
 import io.micronaut.http.HttpRequest
-import io.micronaut.security.authentication.AuthenticationFailed
-import io.micronaut.security.authentication.AuthenticationFailureReason
+import io.micronaut.security.authentication.Authentication
 import io.micronaut.security.authentication.AuthenticationProvider
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
 import jakarta.inject.Singleton
 import org.reactivestreams.Publisher
-import reactor.core.publisher.Flux
-import reactor.core.publisher.FluxSink
+import reactor.core.publisher.Mono
 
 @Singleton
-class AuthenticationProviderUserPassword(private val userService: UserService) : AuthenticationProvider {
+class AuthenticationProviderUserPassword(private val userService: UserService) : AuthenticationProvider<HttpRequest<*>> {
     
     override fun authenticate(
-        httpRequest: HttpRequest<*>?,
+        @Nullable httpRequest: HttpRequest<*>?,
         authenticationRequest: AuthenticationRequest<*, *>
     ): Publisher<AuthenticationResponse> {
-        return Flux.create({ emitter: FluxSink<AuthenticationResponse> ->
+        return Mono.create { emitter ->
             val username = authenticationRequest.identity.toString()
             val password = authenticationRequest.secret.toString()
             
             val userOptional = userService.findByUsername(username)
             
             if (userOptional.isEmpty) {
-                emitter.next(AuthenticationFailed(AuthenticationFailureReason.USER_NOT_FOUND))
-                emitter.complete()
+                emitter.error(AuthenticationResponse.exception("User not found"))
                 return@create
             }
             
             val user = userOptional.get()
             
             if (!user.enabled) {
-                emitter.next(AuthenticationFailed(AuthenticationFailureReason.USER_DISABLED))
-                emitter.complete()
+                emitter.error(AuthenticationResponse.exception("User account is disabled"))
                 return@create
             }
             
             if (!userService.verifyPassword(user, password)) {
-                emitter.next(AuthenticationFailed(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH))
-                emitter.complete()
+                emitter.error(AuthenticationResponse.exception("Invalid credentials"))
                 return@create
             }
             
             // Authentication successful
-            emitter.next(
+            val roles = if (user.isAdmin()) {
+                listOf("ROLE_USER", "ROLE_ADMIN")
+            } else {
+                listOf("ROLE_USER")
+            }
+            
+            emitter.success(
                 AuthenticationResponse.success(
                     user.username,
-                    listOf("ROLE_USER"),
+                    roles,
                     mapOf(
                         "id" to user.id,
                         "email" to user.email,
                         "firstName" to (user.firstName ?: ""),
-                        "lastName" to (user.lastName ?: "")
+                        "lastName" to (user.lastName ?: ""),
+                        "role" to user.role.toString()
                     )
                 )
             )
-            emitter.complete()
-        }, FluxSink.OverflowStrategy.ERROR)
+        }
     }
 }

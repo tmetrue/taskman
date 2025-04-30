@@ -1,5 +1,6 @@
 package com.taskman.dto
 
+import com.taskman.model.Role
 import com.taskman.model.User
 import io.micronaut.serde.annotation.Serdeable
 
@@ -9,7 +10,9 @@ data class UserResponse(
     val username: String,
     val email: String,
     val firstName: String?,
-    val lastName: String?
+    val lastName: String?,
+    val role: Role,
+    val enabled: Boolean
 ) {
     companion object {
         fun from(user: User): UserResponse {
@@ -18,7 +21,9 @@ data class UserResponse(
                 username = user.username,
                 email = user.email,
                 firstName = user.firstName,
-                lastName = user.lastName
+                lastName = user.lastName,
+                role = user.role,
+                enabled = user.enabled
             )
         }
     }
