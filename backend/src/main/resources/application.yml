@@ -1,0 +1,12 @@
+micronaut:
+  application:
+    name: taskman
+  server:
+    port: 8080
+    cors:
+      enabled: true
+
+endpoints:
+  health:
+    enabled: true
+    sensitive: false
