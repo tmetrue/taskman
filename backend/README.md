@@ -124,3 +124,12 @@ To add a new migration:
 | JDBC_URL | PostgreSQL connection URL | jdbc:postgresql://localhost:5432/taskman |
 | JDBC_USER | PostgreSQL username | postgres |
 | JDBC_PASSWORD | PostgreSQL password | postgres |
+| JWT_SECRET | Secret key for JWT token generation | pleaseChangeThisSecretForANewSecretAndMakeItSecure |
+
+## Logging
+
+Authentication failures and security-related events are logged to both console and file:
+
+- Console output for all logs
+- File logging to `logs/taskman.log` with daily rolling policy
+- Specific detailed logging for authentication failures
