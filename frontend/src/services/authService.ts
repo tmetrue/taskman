@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { AuthRequest, UserResponse } from '../types/Auth';
 
-const API_URL = 'http://localhost:8888/api/auth';
+const API_URL = 'http://localhost:8888';
 
 export const authService = {
     async login(username: string, password: string): Promise<string> {
@@ -15,7 +15,7 @@ export const authService = {
     },
 
     async register(userData: { username: string; password: string; email: string }): Promise<UserResponse> {
-        const response = await axios.post<UserResponse>(`${API_URL}/register`, userData);
+        const response = await axios.post<UserResponse>(`${API_URL}/api/auth/register`, userData);
         return response.data;
     },
 
