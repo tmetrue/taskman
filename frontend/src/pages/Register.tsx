@@ -1,26 +1,32 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../services/authService';
+import { register } from '../services/authService';
 import { useAuth } from '../contexts/AuthContext';
 import { Button, TextField, Container, Typography, Box, Alert } from '@mui/material';
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
     const navigate = useNavigate();
     const { setUser } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
+        if (password !== confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
         try {
-            const user = await login({ email, password });
+            const user = await register({ email, password });
             setUser(user);
             navigate('/');
         } catch (err) {
-            setError('Invalid email or password');
+            setError('Registration failed. Please try again.');
         }
     };
 
@@ -35,7 +41,7 @@ const Login: React.FC = () => {
                 }}
             >
                 <Typography component="h1" variant="h5">
-                    Sign in
+                    Sign up
                 </Typography>
                 {error && (
                     <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
@@ -63,9 +69,21 @@ const Login: React.FC = () => {
                         label="Password"
                         type="password"
                         id="password"
-                        autoComplete="current-password"
+                        autoComplete="new-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="confirmPassword"
+                        label="Confirm Password"
+                        type="password"
+                        id="confirmPassword"
+                        autoComplete="new-password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                     />
                     <Button
                         type="submit"
@@ -73,7 +91,7 @@ const Login: React.FC = () => {
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
                     >
-                        Sign In
+                        Sign Up
                     </Button>
                 </Box>
             </Box>
@@ -81,4 +99,4 @@ const Login: React.FC = () => {
     );
 };
 
-export default Login; 
+export default Register; 

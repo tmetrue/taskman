@@ -1,27 +1,54 @@
 import axios from 'axios';
-import { AuthRequest, UserResponse } from '../types/Auth';
 
-const API_URL = 'http://localhost:8888';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+export interface User {
+    id: string;
+    username: string;
+    email: string;
+    role: 'admin' | 'user';
+}
+
+export interface LoginCredentials {
+    username: string;
+    password: string;
+}
+
+export interface RegisterData {
+    username: string;
+    email: string;
+    password: string;
+}
+
+export interface LoginRequest {
+    email: string;
+    password: string;
+}
 
 export const authService = {
-    async login(username: string, password: string): Promise<string> {
-        const response = await axios.post(`${API_URL}/api/auth/login`, { username, password });
-        const token = response.headers['authorization'];
-        if (token) {
-            localStorage.setItem('token', token);
-            axios.defaults.headers.common['Authorization'] = token;
-        }
-        return token;
+    async login(credentials: LoginCredentials): Promise<User> {
+        const response = await axios.post(`${API_URL}/auth/login`, credentials);
+        const { token, user } = response.data;
+        localStorage.setItem('token', token);
+        return user;
     },
 
-    async register(userData: { username: string; password: string; email: string }): Promise<UserResponse> {
-        const response = await axios.post<UserResponse>(`${API_URL}/api/auth/register`, userData);
+    async register(data: RegisterData): Promise<User> {
+        const response = await axios.post(`${API_URL}/auth/register`, data);
         return response.data;
     },
 
-    logout(): void {
-        localStorage.removeItem('token');
-        delete axios.defaults.headers.common['Authorization'];
+    async logout(): Promise<void> {
+        await axios.post(`${API_URL}/auth/logout`);
+    },
+
+    async getCurrentUser(): Promise<User | null> {
+        try {
+            const response = await axios.get(`${API_URL}/auth/me`);
+            return response.data;
+        } catch (error) {
+            return null;
+        }
     },
 
     getToken(): string | null {
@@ -29,6 +56,24 @@ export const authService = {
     },
 
     isAuthenticated(): boolean {
-        return !!this.getToken();
+        return !!localStorage.getItem('token');
+    }
+};
+
+export const login = async (credentials: LoginRequest): Promise<User> => {
+    const response = await axios.post(`${API_URL}/auth/login`, credentials);
+    return response.data;
+};
+
+export const logout = async (): Promise<void> => {
+    await axios.post(`${API_URL}/auth/logout`);
+};
+
+export const getCurrentUser = async (): Promise<User | null> => {
+    try {
+        const response = await axios.get(`${API_URL}/auth/me`);
+        return response.data;
+    } catch (error) {
+        return null;
     }
 }; 
