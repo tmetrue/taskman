@@ -18,6 +18,7 @@ class CorsFilter @Inject constructor(private val corsConfig: CorsConfig) : HttpS
 
     override fun doFilter(request: HttpRequest<*>, chain: ServerFilterChain): Publisher<MutableHttpResponse<*>> {
         return if (request.method == HttpMethod.OPTIONS) {
+            // Handle preflight requests
             Flux.just(HttpResponse.ok<Any>()
                 .header("Access-Control-Allow-Origin", corsConfig.allowedOrigins.joinToString(","))
                 .header("Access-Control-Allow-Methods", corsConfig.allowedMethods.joinToString(","))
@@ -26,6 +27,7 @@ class CorsFilter @Inject constructor(private val corsConfig: CorsConfig) : HttpS
                 .header("Access-Control-Allow-Credentials", corsConfig.allowCredentials.toString())
                 .header("Access-Control-Max-Age", corsConfig.maxAge.toString()))
         } else {
+            // Handle actual requests
             Flux.from(chain.proceed(request))
                 .map { response ->
                     response.headers.apply {

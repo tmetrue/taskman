@@ -5,7 +5,7 @@ const API_URL = 'http://localhost:8888';
 
 export const authService = {
     async login(username: string, password: string): Promise<string> {
-        const response = await axios.post(`${API_URL}/login`, { username, password });
+        const response = await axios.post(`${API_URL}/api/auth/login`, { username, password });
         const token = response.headers['authorization'];
         if (token) {
             localStorage.setItem('token', token);

@@ -20,6 +20,7 @@ micronaut:
     endpoints:
       login:
         enabled: true
+        path: /api/auth/login
       oauth:
         enabled: true
       logout:
@@ -61,10 +62,17 @@ cors:
     - "PUT"
     - "DELETE"
     - "OPTIONS"
+    - "PATCH"
   allowed-headers:
     - "Authorization"
     - "Content-Type"
+    - "Accept"
+    - "Origin"
+    - "X-Requested-With"
+    - "Access-Control-Request-Method"
+    - "Access-Control-Request-Headers"
   exposed-headers:
     - "Authorization"
+    - "Content-Type"
   allow-credentials: true
   max-age: 3600

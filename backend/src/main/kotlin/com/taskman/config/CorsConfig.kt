@@ -10,9 +10,17 @@ import io.micronaut.http.annotation.RequestAttribute
 class CorsConfig {
     var enabled: Boolean = true
     var allowedOrigins: List<String> = listOf("http://localhost:5174")
-    var allowedMethods: List<String> = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
-    var allowedHeaders: List<String> = listOf("Authorization", "Content-Type")
-    var exposedHeaders: List<String> = listOf("Authorization")
+    var allowedMethods: List<String> = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+    var allowedHeaders: List<String> = listOf(
+        "Authorization",
+        "Content-Type",
+        "Accept",
+        "Origin",
+        "X-Requested-With",
+        "Access-Control-Request-Method",
+        "Access-Control-Request-Headers"
+    )
+    var exposedHeaders: List<String> = listOf("Authorization", "Content-Type")
     var allowCredentials: Boolean = true
     var maxAge: Long = 3600
 } 
